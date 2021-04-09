@@ -3,21 +3,19 @@
 
 namespace tool {
 
-using namespace std::chrono;
-
 // \brief Measure execution time of a function.
 // \tparam N Number of function calls over which result will be averaged.
 // \tparam D Duration type in which measure time.
 // \tparam Fn Function to measure.
 // \tparam Args Function arguments for perfect forwarding.
 // \return Average execution time.
-template<size_t N = 1, class D = nanoseconds, class Fn, class ...Args>
+template<size_t N = 1, class D = std::chrono::nanoseconds, class Fn, class ...Args>
 auto measure_time(Fn &&fn, Args &&...args)
 {
-    const auto start = high_resolution_clock::now();
+    const auto start = std::chrono::high_resolution_clock::now();
     for (auto i = 0; i < N; ++i) (fn)(std::forward<Args>(args)...);
-    const auto stop = high_resolution_clock::now();
-    return duration_cast<D>(stop - start).count() / static_cast<double>(N);
+    const auto stop = std::chrono::high_resolution_clock::now();
+    return std::chrono::duration_cast<D>(stop - start).count() / static_cast<double>(N);
 }
 
 // \brief Specialization to measure execution time of a member function.
@@ -27,13 +25,13 @@ auto measure_time(Fn &&fn, Args &&...args)
 // \tparam Ptr Pointer to object instance on which member function will be called.
 // \tparam Args Function arguments for perfect forwarding.
 // \return Average execution time.
-template<size_t N = 1, class D = nanoseconds, class Fn, class Ptr, class ...Args>
+template<size_t N = 1, class D = std::chrono::nanoseconds, class Fn, class Ptr, class ...Args>
 auto measure_time(Fn &&fn, Ptr *ptr, Args &&...args)
 {
-    const auto start = high_resolution_clock::now();
+    const auto start = std::chrono::high_resolution_clock::now();
     for (auto i = 0; i < N; ++i) (ptr->*fn)(std::forward<Args>(args)...);
-    const auto stop = high_resolution_clock::now();
-    return duration_cast<D>(stop - start).count() / static_cast<double>(N);
+    const auto stop = std::chrono::high_resolution_clock::now();
+    return std::chrono::duration_cast<D>(stop - start).count() / static_cast<double>(N);
 }
 
 // Return n-th bit of arr starting from LSB.
@@ -60,6 +58,7 @@ constexpr void clr_bit(uint8_t *arr, int n)
     arr[n >> 3] &= ~(1 << (n & 7));
 }
 
+// Print bits nicely with MSB at left.
 void print_bits(uint8_t *arr, int n, int pos)
 {
     for (int i = 0; i < n; ++i) {
@@ -72,6 +71,7 @@ void print_bits(uint8_t *arr, int n, int pos)
     printf("\n");
 }
 
+// Print bits nicely from left to right.
 void print_bytes(uint8_t *arr, int n, int pos)
 {
     for (int i = 0; i < n; ++i) {
@@ -84,6 +84,7 @@ void print_bytes(uint8_t *arr, int n, int pos)
     printf("\n");
 }
 
+// Convert string to float.
 constexpr float str_to_float(char *str)
 {
     float result = 0.0;
